@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Hero } from './hero';
-import { HEROES } from './mock-heroes';
 import { Observable, of } from 'rxjs';
 import { MessageService } from './messages.service';
+import * as Parse from 'parse';
+
 
 @Injectable({
   providedIn: 'root'
@@ -12,9 +13,10 @@ export class HeroService {
 
   constructor(private messageService: MessageService) { }
 
-  getHeroes(): Observable<Hero[]> {
-    // TODO: send the message _after_ fetching the heroes
-    this.messageService.add('HeroService: fetched heroes');
-    return of(HEROES);
+  async getHeroes(): Promise<Hero[]> {
+    const heroClass = Parse.Object.extend('Hero');
+    const query = new Parse.Query(heroClass);
+    const loadedHeroes = await query.find();
+    return loadedHeroes;
   }
 }
